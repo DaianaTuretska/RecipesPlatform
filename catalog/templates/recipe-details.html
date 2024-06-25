@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+{% block title %}Recipe details{% endblock %}
+
+{% block body %}
+<div class="container border p-3 mb-3 mt-5 book_details_frame rounded">
+    <div class="d-flex justify-content-start">
+        <div class="book_details_img">
+            <img class="recipe-image-card" style="margin-bottom: 10px" id="cover_image" src="{{ recipe.image.url }}"
+                alt="book cover">
+            <p>Rating: <b>{{ recipe.rating|floatformat:2 }}</b></p>
+            <p>
+                Cuisine: <b><a class="links"
+                        href="{% url 'catalog:recipes-search'%}?cuisine={{ recipe.cuisine }}">{{ recipe.cuisine }}</a></b>
+            </p>
+            <p>
+                Category: <b><a class="links"
+                        href="{% url 'catalog:recipes-search'%}?category={{ recipe.category }}">{{ recipe.category }}</a></b>
+            </p>
+            {% if recipe.author %}
+            <p>
+                Author <a class="links"
+                    href="{% url 'catalog:form-recipes' %}?searchbar={{ recipe.author.firstname|add:" "|add:recipe.author.lastname }}">
+                    <b>
+                        {{ recipe.author.firstname|title  }} {% if recipe.author.lastname|length > 13 %}
+                        {{ recipe.author.lastname|slice:':10'|title }}...
+                        {% else %}
+                        {{ recipe.author.lastname|title }}
+                        {% endif %}
+                    </b>
+                </a>
+            </p>
+            {% endif %}
+            <p>
+                Year: <a class="links"
+                    href="{% url 'catalog:form-recipes' %}?searchbar={{ recipe.year }}"><b>{{ recipe.year }}</b></a>
+            </p>
+            <div style="margin-top: 10px" class="dropdown show mt-2">
+                <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Links on recipe
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    {% for video_link in recipe.video_links.all %}
+                    <a class="dropdown-item" href="{{ video_link.url }}">{{ video_link.name| slice:':25' }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+            {% if recipe in user.saved_recipes.all %}
+            <div class="add-to-wishlist">
+                <a href="{% url 'catalog:delete-from-saved-recipes' recipe.pk %}" class="btn btn-warning">Delete from
+                    saved</a>
+            </div>
+            {% else %}
+            <div class="delete-from-wishlist">
+                <a href="{% url 'catalog:add-to-saved-recipes' recipe.pk %}" class="btn btn-success">Add to saved</a>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+        <div class="book_details_text">
+            <div class="row">
+                <div class="col">
+                    <span class="h3">{{ recipe.title }}</span>
+                </div>
+                <div class="col-2 custom">
+                    <a class="btn btn-secondary" href="{{ request.META.HTTP_REFERER  }}">Back</a>
+                </div>
+            </div>
+            <span data-toggle="tooltip" data-placement="top" title="Total saved {{ book.statistic.total_read }}">
+                <img class="saved-icon" src="{% static 'images/saved_icon.png' %}" alt="total read icon">
+                <span class="font-weight-bolder h5">{{ recipe.total_saved }}</span>
+            </span><br><br>
+            {% if recipe.description %}
+            <p>
+                {{ recipe.description|safe }}
+            </p>
+            {% endif %}
+            {% if recipe.ingredients %}
+            <p>
+                {{ recipe.ingredients|safe }}
+            </p>
+            {% endif %}
+            {% if recipe.cooking_method %}
+            <p>
+                {{ recipe.cooking_method|safe }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if user.is_authenticated and user.status == 'active' %}
+    <form style="margin-bottom: 80px;" onsubmit="submitForm(event, '{% url 'catalog:recipe-rating' recipe.pk %}')""
+        action="">
+        <div class=" form-group">
+        <div style="margin-top: -280px;margin-bottom: -340px" class="page">
+            <div class="page__demo">
+                <div class="page__group">
+                    <div class="rating">
+                        <input type="radio" name="rating-star" class="rating__control screen-reader" id="rc1" value="1">
+                        <input type="radio" name="rating-star" class="rating__control screen-reader" id="rc2" value="2">
+                        <input type="radio" name="rating-star" class="rating__control screen-reader" id="rc3" value="3">
+                        <input type="radio" name="rating-star" class="rating__control screen-reader" id="rc4" value="4">
+                        <input type="radio" name="rating-star" class="rating__control screen-reader" id="rc5" value="5">
+                        <label for="rc1" class="rating__item">
+                            <svg class="rating__star">
+                                <use xlink:href="#star"></use>
+                            </svg>
+                            <span class="screen-reader">1</span>
+                        </label>
+                        <label for="rc2" class="rating__item">
+                            <svg class="rating__star">
+                                <use xlink:href="#star"></use>
+                            </svg>
+                            <span class="screen-reader">2</span>
+                        </label>
+                        <label for="rc3" class="rating__item">
+                            <svg class="rating__star">
+                                <use xlink:href="#star"></use>
+                            </svg>
+                            <span class="screen-reader">3</span>
+                        </label>
+                        <label for="rc4" class="rating__item">
+                            <svg class="rating__star">
+                                <use xlink:href="#star"></use>
+                            </svg>
+                            <span class="screen-reader">4</span>
+                        </label>
+                        <label for="rc5" class="rating__item">
+                            <svg class="rating__star">
+                                <use xlink:href="#star"></use>
+                            </svg>
+                            <span class="screen-reader">5</span>
+                        </label>
+                    </div>
+                    <span class="page__hint">Rating</span>
+                </div>
+            </div>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+            <symbol id="star" viewBox="0 0 26 28">
+                <path
+                    d="M26 10.109c0 .281-.203.547-.406.75l-5.672 5.531 1.344 7.812c.016.109.016.203.016.313 0 .406-.187.781-.641.781a1.27 1.27 0 0 1-.625-.187L13 21.422l-7.016 3.687c-.203.109-.406.187-.625.187-.453 0-.656-.375-.656-.781 0-.109.016-.203.031-.313l1.344-7.812L.39 10.859c-.187-.203-.391-.469-.391-.75 0-.469.484-.656.875-.719l7.844-1.141 3.516-7.109c.141-.297.406-.641.766-.641s.625.344.766.641l3.516 7.109 7.844 1.141c.375.063.875.25.875.719z" />
+            </symbol>
+        </svg>
+</div>
+<button style="float: right;" type="submit" class="btn btn-info" id="addRatingButton">Add rating
+</button>
+
+</form>
+{% endif %}
+
+</div>
+<div class="book-details-alert-container" id="bookDetailsAlertContainer">
+    <div class="alert" id="errorMessage">
+        &nbsp;
+    </div>
+</div>
+<div style="background-color: white;" class="container border p-3 mb-3 book_details_frame rounded">
+    {% if user.is_authenticated and user.status == 'active' %}
+    <div class="form-group">
+        <h4 for="exampleFormControlTextarea1">Reviews</h4>
+        {{ form.media }}
+        {{ form.comment }}
+    </div>
+    <div class="d-flex flex-row-reverse">
+        <button id='addComment' onclick="add_comment()" class="btn btn-info">Add comment</button>
+    </div>
+    <div id="recipe-reviews" url="{% url 'catalog:recipe-reviews' recipe.pk %}" style="display: none;"></div>
+    <div id="userId" value="{{user.pk}}" style="display: none;"></div>
+    <div id="userRole" value="{{user.role}}" style="display: none;"></div>
+
+    <div id="commentList">
+    </div>
+    {% else %}
+    {% if reviews %}
+    {% for review in reviews %}
+    <div id="commentArea">
+        <div class="card-header book-details-user-name">
+            {{ review.user.firstname }} {{ review.user.lastname }}
+        </div>
+        <div class="card-body">
+            <blockquote class="blockquote mb-0">
+                <p class="book-details-review-text">{{ review.comment }}</p>
+                <footer class="blockquote-footer book-details-user-published"><cite title="Source Title">Published
+                        {{ review.created_at }}</cite></footer>
+            </blockquote>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <h5 class="text-secondary d-flex justify-content-center">There are no reviews yet</h5>
+    {% endif %}
+    {% endif %}
+</div>
+
+
+<script src="{% static 'js/bookDetails.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+{% endblock %}

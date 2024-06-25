@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home page{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <h2 class="h2-home-page" style="margin-top: 25px;">Popular recipes of the week</h2>
+    <!-- Slider main container -->
+    <div class="swiper-container first-container">
+        <!-- Additional required wrapper -->
+        <div class="swiper-wrapper">
+            <!-- Slides -->
+            {% for recipe in top_recipes %}
+            <div class="swiper-slide">
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    <p><b>{{ recipe.title }}</b></p>
+                    <p>{{ recipe.author.firstname|title  }} {{ recipe.author.lastname|title  }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="swiper-button-next first-next" style="position: relative; top: -278px; left: 1150px"></div>
+    <div class="swiper-button-prev first-prev" style="position: relative; top: -300px; left: -65px;"></div>
+</div>
+
+
+<div class="container">
+    <!--    New books swiper-->
+    <h2 class="h2-home-page">New recipes on a website</h2>
+    <div class="swiper-container second-container">
+        <!-- Additional required wrapper -->
+        <div class="swiper-wrapper">
+            <!-- Slides -->
+            {% for recipe in new_recipes %}
+            <div class="swiper-slide">
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    <p><b>{{ recipe.title }}</b></p>
+                    <p>{{ recipe.author.firstname|title  }} {{ recipe.author.lastname|title  }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="swiper-button-next second-next" style="position: relative; top: -278px; left: 1150px"></div>
+    <div class="swiper-button-prev second-prev" style="position: relative; top: -300px; left: -65px;"></div>
+</div>
+
+<div class="container">
+    <!--    New books swiper-->
+    <h2 class="h2-home-page">Users recipes</h2>
+    <div class="swiper-container users-recipes-container">
+        <!-- Additional required wrapper -->
+        <div class="swiper-wrapper">
+            <!-- Slides -->
+            {% for recipe in users_recipes %}
+            <div class="swiper-slide">
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    <p><b>{{ recipe.title }}</b></p>
+                    <p>{{ recipe.author.firstname|title  }} {{ recipe.author.lastname|title  }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="swiper-button-next users-recipes-next" style="position: relative; top: -278px; left: 1150px"></div>
+    <div class="swiper-button-prev users-recipes-prev" style="position: relative; top: -300px; left: -65px;"></div>
+</div>
+
+
+<div class="container">
+    <!--    Search by category section-->
+    <h2 class="h2-home-page">Search your favourite recipe</h2>
+    <form class="search" action="{% url 'catalog:form-recipes' %}">
+        <input type="text" class="form-control search-category-input" placeholder="Title/ Author/ Year"
+            name="searchbar">
+        <input type="submit" class="btn btn-dark search-category-button" value="Search">
+    </form>
+    <div class="category-wrapper">
+        <div class="row">
+            {% for cuisine in cuisines.distinct %}
+            <div class="col-3">
+                <a style="color: #323232;"
+                    href="{% url 'catalog:recipes-search' %}?cuisine={{ cuisine }}">{{ cuisine }}</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

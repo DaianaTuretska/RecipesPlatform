@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Authors{% endblock %}
+
+{% block body %}
+<div class="container" style="min-height: 640px">
+    <h2 class="h2-author">Top authors</h2>
+    <div class="authors-box d-flex flex-wrap">
+        {% for author in authors %}
+        {% with author_fullname=author.firstname|title|add:' '|add:author.lastname|title %}
+        <div class="author-box m-2 border p-3 mb-2 rounded">
+
+            <a style="" href="{% url 'catalog:form-recipes' %}?searchbar={{ author_fullname }}">
+                <h3>{% if author_fullname|length > 30 %}
+                    {{ author_fullname|slice:':27' }}...
+                    {% else %}
+                    {{ author_fullname }}
+                    {% endif %}
+                </h3>
+                <small style="font-size: medium">Rating: <b>{{ author.total_rating|floatformat }}</b></small><br>
+                <small style="font-size: medium">Average rating :
+                    <b>{{ author.average_rating|floatformat }}</b></small><br>
+                <small style="font-size: medium">Total saved : <b>{{ author.total_saved|floatformat }}</b></small><br>
+            </a>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

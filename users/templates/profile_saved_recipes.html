@@ -1,0 +1,48 @@
+{% extends 'base_profile.html' %}
+{% load static %}
+{% block bookshelf_link_class %}active{% endblock %}
+{% block profile_content %}
+{% if recommended_recipes %}
+<div class="container rec-books">
+    <h2 class="my-5">Recommended for you</h2>
+    {% if recommended_recipes %}
+    <div class="swiper-container third-container">
+        <div class="swiper-wrapper">
+            {% for recipe in recommended_recipes %}
+            <div class="swiper-slide">
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    <p><b>{{recipe.title}}</b></p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+    <div class="swiper-button-prev first-prev left-arrow"></div>
+    <div class="swiper-button-next first-next right-arrow"></div>
+    {% else %}
+    <p class="text-muted h4">You don't have any recommendations yet. Please save recipes to receive recommendations.
+    </p>
+    {% endif %}
+    <br>
+</div>
+{% endif %}
+<div class="container">
+    <h2 class="mb-5">Saved recipes</h2>
+    {% if saved_recipes %}
+    <div class="row">
+        {% for recipe in saved_recipes %}
+        <div class="col-3">
+            <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                <img class="recipe-image-card" src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                <p><b>{{recipe.title}}</b></p>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted h4">You don't have any saved recipes yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

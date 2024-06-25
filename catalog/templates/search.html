@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search: {{ q }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h2 class="h2-author">Use the search tool to find the right recipe</h2>
+
+    <form class="search" action="{% url 'catalog:form-recipes' %}">
+        <input type="text" class="form-control search-category-input" placeholder="Title/ Author/ Year"
+            name="searchbar">
+        <input type="submit" class="btn btn-info search-category-button" value="Search">
+    </form>
+</div>
+{% if q %}
+<div class="container">
+    <h1 style="margin-top: 25px;">Results of search: {{ q }}</h1>
+</div>
+{% endif %}
+
+<div class="container container-search">
+    {% for recipe in recipes %}
+    <div class="container-search-box">
+        <a href="{% url 'catalog:recipe-details' recipe.pk %}" class="image-search">
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+        </a>
+        <div class="book-search-info">
+            <p>
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    <b>
+                        {% if recipe.title|length > 30 %}
+                        {{ recipe.title| slice:':27' }}...
+                        {% else %}
+                        {{ recipe.title }}
+                        {% endif %}
+                    </b>
+                </a>
+            </p>
+            <p>
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    {% if recipe.description|length > 63 %}
+                    {{ recipe.description|safe|slice:':60' }}...
+                    {% else %}
+                    {{ recipe.description|safe }}
+                    {% endif %}
+                </a>
+            </p>
+            <p>
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    {{ recipe.author.firstname|title  }}
+                    {{ recipe.author.lastname|title  }}
+                </a>
+            </p>
+            <p>
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    {{ recipe.year }}
+                </a>
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Collections{% endblock %}
+
+{% block body %}
+
+<div class="container">
+
+    <h2 class="h2-collections">Most saved recipes</h2>
+    <div class="swiper-container first-container">
+        <!-- Additional required wrapper -->
+        <div class="swiper-wrapper">
+            <!-- Slides -->
+            {% for recipe in recipes_total_saved %}
+            <div class="swiper-slide slide-relative">
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    <p><b>{{ recipe.title }}</b></p>
+                    <p>Total saved: {{ recipe.total_saved }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="swiper-button-next first-next collections-next-arrow"></div>
+    <div class="swiper-button-prev first-prev collections-prev-arrow"></div>
+</div>
+
+<div class="container">
+    <h2 class="h2-collections">Most discussed recipes</h2>
+    <div class="swiper-container first-container">
+        <!-- Additional required wrapper -->
+        <div class="swiper-wrapper">
+            <!-- Slides -->
+            {% for recipe in most_discsused_recipes %}
+            <div class="swiper-slide slide-relative">
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    <p><b>{{ recipe.title }}</b></p>
+                    <p>Total reviews: {{ recipe.total_reviews }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="swiper-button-next first-next collections-next-arrow"></div>
+    <div class="swiper-button-prev first-prev collections-prev-arrow"></div>
+</div>
+{% endblock %}

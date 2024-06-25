@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Login Error</title>
+</head>
+
+<body>
+    {% csrf_token %}
+    <form class="form-signin">
+        <div class="text-center mb-4">
+            <h3>For get access to this page please sign in!</h3>
+
+            <button data-toggle="modal" data-target="#authModal" data-toggle="modal" type="submit"
+                class="btn btn-primary">
+                Sign
+                in
+            </button>
+        </div>
+
+
+        <div id="authModal" class="modal fade bd-example-modal-md" role="dialog" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title text-ultramarine" id="AuthModalLabel">Sign In</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+
+
+                    <div class="modal-body">
+                        <form class="login-form">
+
+                            <div class="form-group">
+                                <label for="inputUsername" class="text-ultramarine">Username</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon1">
+                                            <img class="input-icon" src="/static/images/sign-in-alt-solid.svg"
+                                                alt="login icon">
+                                        </span>
+                                    </div>
+                                    <input onkeyup="combinedСallUsername()" class="form-control" id="inputUsername"
+                                        aria-describedby="usernameHelp">
+                                </div>
+                                <small id="usernameHelp" class="form-text text-muted">
+                                    <div id="errorUsername"></div>
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputPassword" class="text-ultramarine">Password</label>
+                                <div class="mb-2 input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon1">
+                                            <img class="input-icon" src="/static/images/key-solid.svg" alt="key icon">
+                                        </span>
+                                    </div>
+
+                                    <input onkeyup="combinedСallPassword()" type="password" name="password"
+                                        class="form-control" id="inputPassword">
+                                </div>
+                                <small id="passwordHelp" class="form-text text-muted">
+                                    <div id="errorPassword"></div>
+                                </small>
+                                <div id="errorlogin" style="color:red"></div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="text-right mr-4">
+                        Forgot password? <a href="{% url 'users:reset-password' %}">Click here</a>
+                    </div>
+                    <div class="modal-footer">
+
+                        <div class="mb-3">
+                            <a href="{% url 'users:registration' %}" class="btn btn-link">Sign Up</a>
+                        </div>
+
+                        {% if request.GET.next %}
+                        <input type="hidden" name="next" id="nextPage" value="{{request.GET.next}}">
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-primary btn-lg btn-block login-btn" id="submitButton"
+                                style="max-width:500px" onclick="login_user_redirect()" disabled="disabled">Sign In
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- Custom scripts -->
+    <script src="{% static 'js/redirect_login.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

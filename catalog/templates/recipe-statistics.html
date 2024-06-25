@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}Recipe statistics{% endblock %}
+
+{% block body %}
+<div class="border p-3 recipe-statistics-frame rounded">
+    <div class="d-flex align-items-center">
+        <canvas id="ratingsChart" width="100" height="100"></canvas>
+        <canvas class="ml-5" id="comparisonChart" width="100" height="100"></canvas>
+    </div>
+</div>
+<script>
+    var ctx = document.getElementById('ratingsChart').getContext('2d');
+    var recipeTitles = "{{recipe.title|safe }}";
+    var dates = {{ dates|safe }};
+    var avgRatings = {{ ratings|safe }};
+    let delayed;
+
+    var ratingsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Average Rating',
+                data: avgRatings,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+            }, ]
+        },
+        options: {
+            animation: {
+                onComplete: () => {
+                  delayed = true;
+                },
+                delay: (context) => {
+                  let delay = 0;
+                  if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                    delay = context.dataIndex * 300 + context.datasetIndex * 100;
+                  }
+                  return delay;
+                },
+              },
+            plugins: {
+                title: {
+                  display: true,
+                  text: 'Average Rating',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                }
+            },
+        }
+    });
+
+    var ctx2 = document.getElementById('comparisonChart').getContext('2d');
+    var data = {
+        labels: ['Views', 'Saved', 'Comments', "Ratings"],
+        datasets: [{
+            label: 'Recipe Statistics',
+            data: [{{ recipe.views_count }}, {{ recipe.saved_count }}, {{ recipe.comments_count }}, {{ recipe.rating_count }}],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(123, 132, 255, 0.2)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(123, 132, 255, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    var comparisonChart = new Chart(ctx2, {
+        type: 'doughnut', // or 'pie'
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed !== null) {
+                                label += context.parsed;
+                            }
+                            return label;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Statistics Comparing',
+                }
+            }
+        },
+    });
+</script>
+{% endblock %}

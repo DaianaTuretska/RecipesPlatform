@@ -1,0 +1,35 @@
+{% extends 'base_profile.html' %}
+{% load static %}
+{% block my_recipes_link_class %}active{% endblock %}
+{% block profile_content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h2>My recipes</h2>
+        <div class="d-flex flex-column align-items-center">
+            <a href="{% url 'admin:catalog_recipe_add' %}" class="btn btn-info btn-block mb-2">Add Recipe</a>
+            <a href="{% url 'catalog:general-statistics' %}" class="btn btn-info btn-block">General Statistics</a>
+        </div>
+    </div>
+    {% if my_recipes %}
+    <div class="row">
+        {% for recipe in my_recipes %}
+        <div class="col-md-3 mb-4 d-flex align-items-stretch">
+            <div class="card w-100 d-flex flex-column">
+                <a href="{% url 'catalog:recipe-details' recipe.pk %}" class="text-decoration-none">
+                    <img class="card-img-top recipe-image-card" src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ recipe.title }}</h5>
+                    </div>
+                </a>
+                <div class="mt-auto">
+                    <a class="btn btn-info btn-block" href="{% url 'catalog:recipe-statistics' recipe.pk %}">Statistics</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted h4">You don't have any added recipes yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cancel{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <h2 class="h2-donate">Something went wrong, contact us if you need any help</h2>
+  <p>You can always contact us via <a href="{% url 'users:help-email' %}">email</a></p>
+  <div class="img-container">
+    <img src="{% static 'images/red-cross.png' %}" alt="Red Cross">
+  </div>
+
+
+</div>
+
+{% endblock %}

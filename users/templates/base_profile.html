@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block title %}User Profile{% endblock %}
+
+{% block body %}
+<div class="container mt-3 mb-2">
+    <ul class="nav nav-tabs nav-justified">
+        <li class="nav-item">
+            <a class="nav-link {% block details_link_class %}{% endblock %}"
+                href="{% url 'users:profile-details' %}">Profile detalis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% block bookshelf_link_class %}{% endblock %}"
+                href="{% url 'users:profile-saved-recipes' %}">Saved recipes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% block my_recipes_link_class %}{% endblock %}"
+                href="{% url 'users:profile-my-recipes' %}">My recipes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% block change_password_link_class %}{% endblock %}"
+                href="{% url 'users:change-password' %}">Change password</a>
+        </li>
+    </ul>
+</div>
+<div class="container mb-5">
+    {% block profile_content %}
+    {% endblock %}
+</div>
+{% endblock %}
