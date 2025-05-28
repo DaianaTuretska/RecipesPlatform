@@ -109,8 +109,16 @@ class RecipeView(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
+    user = models.ForeignKey(
+        to="users.User",
+        related_name="user_views_recipes",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+
     class Meta:
-        unique_together = ("recipe", "ip_address")
+        unique_together = ("recipe", "user", "ip_address")
 
     def __str__(self):
         return f"{self.id}"

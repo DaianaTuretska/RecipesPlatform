@@ -72,4 +72,11 @@ class RecipeStatisticAdmin(admin.ModelAdmin):
 
 @admin.register(models.RecipeView)
 class RecipeViewAdmin(admin.ModelAdmin):
-    list_display = ["id", "recipe", "ip_address", "created_at"]
+    list_display = ["id", "recipe", "user", "ip_address", "created_at"]
+    list_select_related = ["recipe", "user"]
+
+
+@admin.register(models.UserSavedRecipe)
+class UserSavedRecipeAdmin(admin.ModelAdmin):
+    list_display = ["id", "user", "recipe", "created_at"]
+    list_select_related = ["recipe", "user"]

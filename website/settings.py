@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "catalog.apps.CatalogConfig",
     "users.apps.UsersConfig",
     "utils.apps.UtilsConfig",
+    "recommender.apps.RecommenderConfig",
     # 3-rd apps
     "coverage",
     "ckeditor",
@@ -136,3 +137,17 @@ CKEDITOR_CONFIGS = {
         "removePlugins": "exportpdf",
     }
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": os.path.join(BASE_DIR, "django_cache"),
+        "TIMEOUT": 60 * 60 * 24,
+        "OPTIONS": {"MAX_ENTRIES": 1000},
+    }
+}
+
+
+CELERY_BROKER_URL = "amqp://guest:guest@localhost:5672//"
+CELERYD_POOL = "solo"
+CELERY_TIMEZONE = "UTC"

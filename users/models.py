@@ -11,7 +11,13 @@ from .choices import Role
 
 class CustomUserManager(BaseUserManager):
     def create_user(
-        self, firstname, lastname, email, username, is_staff, password=None
+        self,
+        firstname,
+        lastname,
+        email,
+        username,
+        is_staff: bool = True,
+        password: str = None,
     ):
         if not firstname:
             raise ValueError("Users must have a firstname")
@@ -80,7 +86,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         related_name="users_saved",
         through="catalog.UserSavedRecipe",
         blank=True,
-        null=True,
     )
 
     objects = CustomUserManager()

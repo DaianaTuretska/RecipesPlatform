@@ -33,7 +33,7 @@
         <!-- Additional required wrapper -->
         <div class="swiper-wrapper">
             <!-- Slides -->
-            {% for recipe in most_discsused_recipes %}
+            {% for recipe in most_discussed_recipes %}
             <div class="swiper-slide slide-relative">
                 <a href="{% url 'catalog:recipe-details' recipe.pk %}">
                     <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">

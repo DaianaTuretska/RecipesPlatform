@@ -142,3 +142,8 @@ admin/tests/config.py
 local/
 
 local_db.db
+
+.vscode
+
+celerybeat-schedule.*
+django_cache/**

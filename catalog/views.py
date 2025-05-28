@@ -86,7 +86,11 @@ class RecipeDetailsView(View):
         if not recipe:
             return redirect(home)
 
-        RecipeView.objects.get_or_create(recipe=recipe, ip_address=ip_address)
+        RecipeView.objects.get_or_create(
+            recipe=recipe,
+            ip_address=ip_address,
+            user_id=request.user.id,
+        )
 
         return render(
             request,
