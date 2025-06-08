@@ -8,8 +8,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "website.settings")
 app = Celery("website")
 
 app.conf.beat_schedule = {
-    "update-recommendations": {
-        "task": "update_recommendations",
+    "update-popular-recommendations": {
+        "task": "update_popular_recommendations",
+        # "schedule": crontab(hour=0, minute=0),
+        "schedule": 10,
+    },
+    "update-sentiment-recommendations": {
+        "task": "update_sentiment_recommendations",
         # "schedule": crontab(hour=0, minute=0),
         "schedule": 10,
     },

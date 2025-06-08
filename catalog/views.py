@@ -3,6 +3,7 @@ import json
 import stripe
 from collections import defaultdict
 from django.contrib import messages
+from django.core.cache import cache
 from django.contrib.auth.decorators import login_required
 from django.db.models import (
     Q,
@@ -318,7 +319,16 @@ class ChangeReviewStatusView(View):
 
 
 def home(request):
-    top_recipes = cache_storage.get_value("top_recipes")
+    if request.user.is_authenticated:
+        top_recipes_ids = cache.get(f"user:{request.user.id}:recs:popular")
+        recipes_to_like_ids = cache.get(f"user:{request.user.id}:recs:sentiment")
+
+        top_recipes = Recipe.objects.filter(id__in=top_recipes_ids)
+        recipes_to_like = Recipe.objects.filter(id__in=recipes_to_like_ids)
+    else:
+        top_recipes = cache_storage.get_value("top_recipes")
+        recipes_to_like = []
+
     new_recipes = cache_storage.get_value("new_recipes")
     users_recipes = cache_storage.get_value("users_recipes")
     cuisines = cache_storage.get_value("cuisines")
@@ -327,18 +337,18 @@ def home(request):
         top_recipes = (
             Recipe.objects.filter(status=Status.ACTIVE)
             .annotate(rating=Avg("statistics__rating"))
-            .order_by("-rating")[:20]
+            .order_by("-rating")[:10]
         )
         cache_storage.add_value("top_recipes", top_recipes)
 
     if new_recipes is None:
-        new_recipes = Recipe.objects.filter(status=Status.ACTIVE).order_by("-pk")[:20]
+        new_recipes = Recipe.objects.filter(status=Status.ACTIVE).order_by("-pk")[:10]
         cache_storage.add_value("new_recipes", new_recipes)
 
     if users_recipes is None:
         users_recipes = Recipe.objects.filter(
             status=Status.ACTIVE, author__isnull=False
-        ).order_by("-pk")[:20]
+        ).order_by("-pk")[:10]
         cache_storage.add_value("users_recipes", users_recipes)
 
     if cuisines is None:
@@ -350,6 +360,7 @@ def home(request):
         "home.html",
         {
             "top_recipes": top_recipes,
+            "recipes_to_like": recipes_to_like,
             "new_recipes": new_recipes,
             "users_recipes": users_recipes,
             "cuisines": cuisines,

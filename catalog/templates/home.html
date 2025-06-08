@@ -6,7 +6,7 @@
 {% block body %}
 
 <div class="container">
-    <h2 class="h2-home-page" style="margin-top: 25px;">Popular recipes of the week</h2>
+    <h2 class="h2-home-page" style="margin-top: 25px;">Popular recipes</h2>
     <!-- Slider main container -->
     <div class="swiper-container first-container">
         <!-- Additional required wrapper -->
@@ -27,6 +27,30 @@
     <div class="swiper-button-prev first-prev" style="position: relative; top: -300px; left: -65px;"></div>
 </div>
 
+
+{% if recipes_to_like %}
+    <div class="container">
+        <h2 class="h2-home-page" style="margin-top: 25px;">Recipes You’ll Love</h2>
+        <!-- Slider main container -->
+        <div class="swiper-container recipes-to-like-container">
+            <!-- Additional required wrapper -->
+            <div class="swiper-wrapper">
+                <!-- Slides -->
+                {% for recipe in recipes_to_like %}
+                <div class="swiper-slide">
+                    <a href="{% url 'catalog:recipe-details' recipe.pk %}">
+                        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+                        <p><b>{{ recipe.title }}</b></p>
+                        <p>{{ recipe.author.firstname|title  }} {{ recipe.author.lastname|title  }}</p>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="swiper-button-next to-like-next" style="position: relative; top: -278px; left: 1150px"></div>
+        <div class="swiper-button-prev to-like-prev" style="position: relative; top: -300px; left: -65px;"></div>
+    </div>
+{% endif %}
 
 <div class="container">
     <!--    New books swiper-->
