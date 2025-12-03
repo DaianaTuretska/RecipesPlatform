@@ -147,3 +147,11 @@ local_db.db
 
 celerybeat-schedule.*
 django_cache/**
+
+
+# ? llm models
+albert_finetuned_three_class/
+distilbert_three_class/
+recommender/llm/**/model/
+distilbert_recipe_finetuned/
+virtual_assistant/assets
