@@ -1,0 +1,185 @@
+/* Floating Round Button */
+#assistantChatButton {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 9999;
+    transition: background 0.2s;
+}
+
+#assistantChatButton:hover {
+    background: #0056d2;
+}
+
+/* Chat Window */
+#assistantChatWindow {
+    position: fixed;
+    bottom: 100px;
+    right: 25px;
+
+    /* NEW bigger size */
+    width: 420px;
+    height: 520px;
+
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+
+    /* Smooth animation */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.25s ease;
+    pointer-events: none;
+}
+
+#assistantChatWindow.assistant-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+
+.assistant-hidden {
+    display: none;
+}
+
+.assistant-header {
+    background: #343a40;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.assistant-header button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.assistant-body {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    background: #f8f8f8;
+}
+
+.assistant-footer {
+    display: flex;
+    padding: 10px;
+    background: #eee;
+}
+
+.assistant-footer input {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.assistant-footer button {
+    margin-left: 8px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.assistant-footer button:hover {
+    background: #0056d2;
+}
+
+/* Message bubbles */
+.alert {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+}
+
+/* --- Smooth fade+slide animations --- */
+
+
+
+#assistantChatButton {
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+#assistantChatButton.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* User message bubble */
+.assistant-msg-user {
+    background: #007bff;
+    color: white;
+    padding: 8px 12px;
+    margin: 6px 0;
+    border-radius: 12px 12px 0 12px;
+    align-self: flex-end;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+/* Assistant message bubble */
+.assistant-msg-bot {
+    background: #e4e6eb;
+    color: #000;
+    padding: 8px 12px;
+    margin: 6px 0;
+    border-radius: 12px 12px 12px 0;
+    align-self: flex-start;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+/* Ensure the chat body uses flex for alignment */
+.assistant-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.recipe-block {
+    line-height: 1.5;
+}
+
+.recipe-title {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.recipe-section {
+    margin-top: 10px;
+}
+
+.recipe-section ul {
+    margin: 5px 0 0 15px;
+}
+
+.recipe-section p {
+    margin: 5px 0;
+}

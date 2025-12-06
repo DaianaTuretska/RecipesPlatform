@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "utils.apps.UtilsConfig",
     "recommender.apps.RecommenderConfig",
+    "virtual_assistant.apps.VirtualAssistantConfig",
     # 3-rd apps
     "coverage",
     "ckeditor",

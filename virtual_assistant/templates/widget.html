@@ -1,0 +1,28 @@
+{% load static %}
+<!-- Floating Chat Button -->
+<div id="assistantChatButton">
+    <i class="fa fa-comment"></i>
+</div>
+
+<!-- Chat Window -->
+<div id="assistantChatWindow" class="assistant-hidden" data-api-url="{% url 'virtual_assistant:virtual-assistant' %}">
+    <div class="assistant-header">
+        <span>AI Virtual Assistant</span>
+        <button id="assistantCloseBtn">&times;</button>
+    </div>
+
+    <div class="assistant-body" id="assistantMessages"></div>
+
+    <div class="assistant-footer">
+        <input type="text" id="assistantInput" placeholder="Ask something...">
+        <button id="assistantSendBtn">Send</button>
+    </div>
+</div>
+
+
+<!-- Include FontAwesome for icon -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/assistant.css' %}">
+
+<script src="{% static 'js/virtual_assistant.js' %}"></script>

@@ -1,13 +1,14 @@
 import torch.nn.functional as F
 import torch
 import os
-from dataset import prepare_recipe_dataset
 from transformers import AutoModel, AutoTokenizer
 from pathlib import Path
 
-CURRENT_DIR = Path(__file__).parent
-MODEL_PATH = os.path.join(CURRENT_DIR, "distilbert_recipe_finetuned")
-ASSETS_PATH = os.path.join(CURRENT_DIR, "assets")
+from ..dataset import prepare_recipe_dataset
+
+PARENT_DIR = Path(__file__).parent.parent
+MODEL_PATH = os.path.join(PARENT_DIR, "distilbert_recipe_finetuned")
+ASSETS_PATH = os.path.join(PARENT_DIR, "assets")
 MULTI_EMBEDDINGS_PATH = os.path.join(ASSETS_PATH, "recipe_embeddings_multi.pt")
 DATA_FRAME_PATH = os.path.join(ASSETS_PATH, "recipe_df.pkl")
 ALL_INGREDIENTS = os.path.join(ASSETS_PATH, "all_ingredients_list.pt")
@@ -102,7 +103,7 @@ if __name__ == "__main__":
         {ing.lower() for lst in df["ingredient_list"] for ing in lst}
     )
     all_ing_list = list(unique_ingredients)
-    torch.save(all_ing_list, os.path.join(CURRENT_DIR, ALL_INGREDIENTS))
+    torch.save(all_ing_list, os.path.join(ASSETS_PATH, ALL_INGREDIENTS))
     ingredient_embs = embed_ingredients(all_ing_list)
     torch.save(ingredient_embs, ALL_INGREDIENTS_EMBEDDINGS)
 

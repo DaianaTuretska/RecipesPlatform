@@ -1,6 +1,6 @@
 import torch
 from pathlib import Path
-from search import search
+from virtual_assistant.distilbert.search import search
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 CURRENT_DIR = Path(__file__).parent

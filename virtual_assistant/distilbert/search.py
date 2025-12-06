@@ -4,24 +4,22 @@ import os
 import re
 import pandas as pd
 from pathlib import Path
-from embed import embed_text  # your BERT embedder
+from virtual_assistant.distilbert.embed import embed_text
 
 # Paths
-CURRENT_DIR = Path(__file__).parent
-ASSETS_PATH = os.path.join(CURRENT_DIR, "assets")
+PARENT_DIR = Path(__file__).parent.parent
+ASSETS_PATH = os.path.join(PARENT_DIR, "assets")
 
 MULTI_EMBEDDINGS_PATH = os.path.join(ASSETS_PATH, "recipe_embeddings_multi.pt")
 DATA_FRAME_PATH = os.path.join(ASSETS_PATH, "recipe_df.pkl")
 ALL_INGREDIENTS = os.path.join(ASSETS_PATH, "all_ingredients_list.pt")
 ALL_INGREDIENT_EMBS = os.path.join(ASSETS_PATH, "ingredient_embs.pt")
 
-# Load dataset
 df = pd.read_pickle(DATA_FRAME_PATH)
 
-# Load multi embeddings (contains per-recipe embeddings)
 multi = torch.load(MULTI_EMBEDDINGS_PATH, map_location="cpu")
 full_emb = multi["full_emb"]  # (N, 768)
-ingredients_emb = multi["ingredients_emb"]  # (N, 768)  ← THIS IS WHAT WE WILL USE
+ingredients_emb = multi["ingredients_emb"]  # (N, 768)
 
 # Load ingredient vocabulary + embeddings
 all_ingredients = torch.load(ALL_INGREDIENTS, map_location="cpu")
@@ -198,7 +196,8 @@ def route_query(query):
 
 def rank(q_emb, emb_matrix, top_k=5):
     sims = emb_matrix @ q_emb
-    idx = torch.topk(sims, top_k).indices.tolist()
+    k = min(top_k, len(sims))
+    idx = torch.topk(sims, k).indices.tolist()
     return idx
 
 
@@ -235,8 +234,9 @@ def format_recipe(row):
 """
 
 
-# results = search("recipe with rice in ten minutes")
-# print(results)
+if __name__ == "__main__":
+    results = search("recipe with rice")
+    print(results)
 
-# for _, r in results.iterrows():
-# print(format_recipe(r))
+    for _, r in results.iterrows():
+        print(format_recipe(r))

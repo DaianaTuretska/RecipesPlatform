@@ -320,8 +320,8 @@ class ChangeReviewStatusView(View):
 
 def home(request):
     if request.user.is_authenticated:
-        top_recipes_ids = cache.get(f"user:{request.user.id}:recs:popular")
-        recipes_to_like_ids = cache.get(f"user:{request.user.id}:recs:sentiment")
+        top_recipes_ids = cache.get(f"user:{request.user.id}:recs:popular", [])
+        recipes_to_like_ids = cache.get(f"user:{request.user.id}:recs:sentiment", [])
 
         top_recipes = Recipe.objects.filter(id__in=top_recipes_ids)
         recipes_to_like = Recipe.objects.filter(id__in=recipes_to_like_ids)
