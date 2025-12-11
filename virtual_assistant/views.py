@@ -1,8 +1,7 @@
 import json
 from django.views import View
 from django.http import JsonResponse
-from django.core.serializers.json import DjangoJSONEncoder
-from .distilbert.search import search, format_recipe
+from .llm.generate_recipe import ask
 from .models import Message
 
 
@@ -18,38 +17,32 @@ class VirtualAssistantView(View):
         query = body.get("message")
 
         if query:
-            results = search(query, top_k=1)
-            result = results.iloc[0]
-
-            name = result.recipe_name
-            ingredients = result.ingredients
-            directions = result.directions
-            total_time = result.total_minutes
+            print("Incoming prompt:", query)
+            response = ask(query, top_k=10)
 
             Message.objects.create(
                 query=query,
-                recipe_name=name,
-                ingredients=ingredients,
-                directions=directions,
-                total_time=total_time,
+                recipe_name=response["name"],
+                ingredients=response["ingredients"],
+                directions=response["directions"],
+                total_time=response["time"],
                 author=request.user,
             )
 
         else:
             error = "The comment field should not be blank."
-            name = ""
-            ingredients = ""
-            directions = ""
-            total_time = ""
-            response = ""
+            response = {
+                "name": "",
+                "ingredients": "",
+                "directions": "",
+                "total_time": "",
+                "closing_phrase": "",
+            }
 
         return JsonResponse(
             {
                 "query": query,
-                "name": name,
-                "ingredients": ingredients,
-                "directions": directions,
-                "total_time": total_time,
                 "error": error,
+                **response,
             }
         )

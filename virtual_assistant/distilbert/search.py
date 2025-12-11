@@ -121,7 +121,6 @@ def semantic_extract_ingredients(segment, top_k=10):
 
 
 def filter_by_ingredients(df, emb_matrix, req_ingredients):
-    print(f"REQUIRED INGREDIENTS", req_ingredients)
     if not req_ingredients:
         return df, emb_matrix
 
@@ -180,8 +179,6 @@ def route_query(query):
     # -------- 3) merge, deduplicate, and keep only meaningful ones --------
     ingredients = list(set(semantic_ings + fallback_ings))
 
-    print(f"INGREDIENTS {ingredients}")
-
     return {
         "ingredients": ingredients,
         "time": extract_time_constraint(q),
@@ -204,6 +201,8 @@ def rank(q_emb, emb_matrix, top_k=5):
 def search(query, top_k=5):
     info = route_query(query)
 
+    print("Extracted prompt info:\n", info)
+
     # Use ingredient embedding if available
     if info["ingredients"]:
         q_text = " ".join(info["ingredients"])
@@ -213,7 +212,6 @@ def search(query, top_k=5):
     q_emb = embed_text(q_text)
 
     # Filters (FAST)
-    print(info)
     filtered_df, filtered_emb = filter_by_ingredients(df, full_emb, info["ingredients"])
     filtered_df, filtered_emb = filter_by_time(filtered_df, filtered_emb, info["time"])
 

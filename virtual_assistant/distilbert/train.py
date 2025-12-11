@@ -59,4 +59,4 @@ if __name__ == "__main__":
     trainer.train()
 
     trainer.save_model(MODEL_PATH)
-    tokenizer.save_pretrained("distilbert_recipe_finetuned")
+    tokenizer.save_pretrained(MODEL_PATH)

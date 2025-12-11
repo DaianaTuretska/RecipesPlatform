@@ -93,11 +93,11 @@ if __name__ == "__main__":
     df = prepare_recipe_dataset()
     print("DATASET READY")
 
-    # embeddings = embed_fields(df)
-    # torch.save(embeddings, MULTI_EMBEDDINGS_PATH)
+    embeddings = embed_fields(df)
+    torch.save(embeddings, MULTI_EMBEDDINGS_PATH)
 
-    # df.reset_index(drop=True, inplace=True)
-    # df.to_pickle(DATA_FRAME_PATH)
+    df.reset_index(drop=True, inplace=True)
+    df.to_pickle(DATA_FRAME_PATH)
 
     unique_ingredients = sorted(
         {ing.lower() for lst in df["ingredient_list"] for ing in lst}

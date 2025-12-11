@@ -56,8 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let ingredients = data.ingredients || "";
     const directions = data.directions || "";
     const time = data.total_time || null;
+    const closePhrase = data.closing_phrase || null; // NEW FIELD
 
-    // Convert ingredients string → array split by commas
+    // Convert ingredients string → array
     if (typeof ingredients === "string") {
       ingredients = ingredients
         .split(",")
@@ -86,6 +87,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 ? `
                 <div class="recipe-section">
                     <strong>⏱️ Total time:</strong> ${time} minutes
+                </div>
+            `
+                : ""
+            }
+
+            ${
+              closePhrase
+                ? `
+                <div class="recipe-section recipe-close-phrase">
+                    <em>${closePhrase}</em>
                 </div>
             `
                 : ""

@@ -118,7 +118,9 @@
 
 </div>
 
-{% include "widget.html" %}
+{% if request.user.is_authenticated %}
+    {% include "widget.html" %}
+{% endif %}
 
 
 {% endblock %}

@@ -1,175 +1,114 @@
+import re
 import torch
 from pathlib import Path
-from virtual_assistant.distilbert.search import search
+from typing import Any
+
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-CURRENT_DIR = Path(__file__).parent
-MODEL_DIR = CURRENT_DIR / "gpt2-recipes-finetuned"
+from ..distilbert.search import search
+from pandas.core.indexing import _iLocIndexer
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
-model = AutoModelForCausalLM.from_pretrained(MODEL_DIR).to(device)
+PARENT_DIR = Path(__file__).parent.parent
+MODEL_DIR = PARENT_DIR / "phi3_lora_finetuned"
+
+
+# Load tokenizer
+tokenizer = AutoTokenizer.from_pretrained(
+    MODEL_DIR,  # <-- DO NOT CAST TO STRING
+    trust_remote_code=True,
+    local_files_only=True,
+)
+
+# Load model
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_DIR,  # <-- DO NOT CAST TO STRING
+    torch_dtype=torch.float16,
+    device_map="auto",
+    trust_remote_code=True,
+    local_files_only=True,
+)
+
 model.eval()
 
 
-# ============================================================
-# BASE GENERATOR
-# ============================================================
+def build_prompt(result: _iLocIndexer, prompt: str):
+    recipe_name = result.recipe_name.strip()
+    ingredients = result.ingredients.strip()
+    directions = result.directions.strip()
+
+    return f"""### System:
+You are a specialized Chef Assistant.
+
+### User:
+Context: 
+
+Title: {recipe_name}
+Ingredients List: {ingredients}
+Method: {directions}
 
 
-def generate_gpt2(prompt, max_new_tokens=80, temperature=0.8, top_p=0.92):
-    inputs = tokenizer(prompt, return_tensors="pt").to(device)
+Question:
+{prompt}
 
-    output = model.generate(
+### Assistant:
+"""
+
+
+def ask(prompt: str, top_k: int = 1) -> dict[str, Any]:
+    results = search(prompt, top_k=top_k)
+    print("Acquired results:\n", results)
+    result = results.iloc[0]
+    llm_prompt = build_prompt(result, prompt)
+
+    print("Built prompt:\n", llm_prompt)
+    inputs = tokenizer(llm_prompt, return_tensors="pt").to(model.device)
+
+    outputs = model.generate(
         **inputs,
-        max_new_tokens=max_new_tokens,
-        temperature=temperature,
-        top_p=top_p,
+        max_new_tokens=300,
+        temperature=0.3,
         do_sample=True,
-        repetition_penalty=1.12,
-        eos_token_id=tokenizer.eos_token_id,
+        use_cache=False,
     )
-    return tokenizer.decode(output[0], skip_special_tokens=True)
+
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
+    print("Got response from LLM:\n", response)
+    return parse_llm_output(response, result.total_minutes)
 
 
-# ============================================================
-# HELPERS
-# ============================================================
+def parse_llm_output(text: str, time: str) -> dict[str, Any]:
+    response = text.split("### Assistant:")[-1].strip()
+    lines = response.splitlines()
+    recipe_name = next(line.strip() for line in lines if line.strip())
 
+    ingredients_match = re.search(
+        r"\*\*Ingredients:\*\*\s*(.*?)\s*\*\*Instructions:\*\*", text, re.DOTALL
+    )
 
-def extract_top_ingredients(df, top_k=10):
-    """Collect most common ingredients from df results."""
-    from collections import Counter
+    ingredients_block = ingredients_match.group(1).strip() if ingredients_match else ""
 
-    all_ings = []
-    for lst in df["ingredient_list"]:
-        all_ings.extend(lst)
-    freq = Counter(all_ings)
-    return [ing for ing, _ in freq.most_common(top_k)]
+    try:
+        ingredients = eval(ingredients_block)
+    except:
+        ingredients = [
+            line.strip() for line in ingredients_block.splitlines() if line.strip()
+        ]
 
+    parts = text.split("**Instructions:**", 1)[1].strip().splitlines()
 
-# ============================================================
-# STAGE 1 — TITLE GENERATION
-# ============================================================
+    non_empty = [p for p in parts if p.strip()]
+    closing_phrase = non_empty[-1]
+    instructions = "\n".join(non_empty[:-1]).strip()
 
+    return {
+        "name": recipe_name,
+        "ingredients": ingredients,
+        "directions": instructions,
+        "time": time,
+        "closing_phrase": closing_phrase,
+    }
 
-def generate_title(query, top_ings):
-    prompt = f"""
-Write a creative and appetizing recipe title.
-
-User request: "{query}"
-Inspiration ingredients: {", ".join(top_ings)}
-
-Title: """
-    out = generate_gpt2(prompt, max_new_tokens=12, temperature=0.7)
-
-    # take only the first line
-    title = out.split("\n")[0].replace("Title:", "").strip()
-    return title
-
-
-# ============================================================
-# STAGE 2 — INGREDIENT LIST GENERATION
-# ============================================================
-
-
-def generate_ingredients_block(title, top_ings):
-    prompt = f"""
-Recipe:
-Title: {title}
-Ingredients:
-- """
-
-    text = generate_gpt2(prompt, max_new_tokens=80, temperature=0.85)
-    lines = text.split("\n")
-
-    ingredients = []
-    for ln in lines:
-        ln = ln.strip()
-        if ln.startswith("- "):
-            ingredients.append(ln[2:].strip())
-        elif ln.startswith("Directions"):
-            break
-        elif ln == "":
-            break
-
-    # simple cleanup
-    ingredients = [x for x in ingredients if 2 <= len(x) <= 60]
-
-    return ingredients
-
-
-# ============================================================
-# STAGE 3 — STEP-BY-STEP DIRECTIONS
-# ============================================================
-
-
-def generate_directions(title, ingredients):
-    ing_text = "\n".join(f"- {i}" for i in ingredients)
-
-    prompt = f"""
-Recipe:
-Title: {title}
-Ingredients:
-{ing_text}
-
-Directions:
-1. """
-
-    text = generate_gpt2(prompt, max_new_tokens=150, temperature=0.9)
-
-    # extract steps lines
-    steps = []
-    for ln in text.split("\n"):
-        ln = ln.strip()
-        if ln.startswith(tuple(str(i) + "." for i in range(1, 10))):
-            steps.append(ln)
-        if len(steps) >= 8:  # limit steps
-            break
-
-    # cleanup
-    steps = [s for s in steps if len(s) > 3]
-
-    return steps
-
-
-# ============================================================
-# FULL PIPELINE
-# ============================================================
-
-
-def generate_recipe(query: str):
-    # 1) Retrieve semantic matches
-    results_df = search(query, top_k=3)
-    print(results_df)
-
-    if len(results_df) == 0:
-        return "No relevant recipes found."
-
-    # 2) Extract top real ingredients
-    top_ings = extract_top_ingredients(results_df, top_k=10)
-
-    # 3) Generate structured recipe via 3-stage GPT-2
-    title = generate_title(query, top_ings)
-    ingredients = generate_ingredients_block(title, top_ings)
-    steps = generate_directions(title, ingredients)
-
-    # Assemble final recipe
-    final = f"Recipe:\nTitle: {title}\n\nIngredients:\n"
-    for i in ingredients:
-        final += f"- {i}\n"
-
-    final += "\nDirections:\n"
-    for s in steps:
-        final += f"{s}\n"
-
-    return final.strip()
-
-
-# ============================================================
-# TEST
-# ============================================================
 
 if __name__ == "__main__":
-    print(generate_recipe("recipe with rice for dinner"))
+    print(ask("soup with chicken"))

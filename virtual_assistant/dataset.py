@@ -73,6 +73,7 @@ def detect_cuisine(ingredients):
 
 def prepare_recipe_dataset() -> pd.DataFrame:
     df = pd.read_csv(RECIPES_PATH)
+    df = df.dropna(subset=["recipe_name", "ingredients", "directions"])
 
     df["document_text"] = (
         df["recipe_name"].fillna("")

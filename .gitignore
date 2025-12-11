@@ -155,3 +155,5 @@ distilbert_three_class/
 recommender/llm/**/model/
 distilbert_recipe_finetuned/
 virtual_assistant/assets
+phi3_lora_finetuned/
+recommender/prediction/model/
